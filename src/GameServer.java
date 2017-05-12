@@ -15,6 +15,12 @@ public class GameServer {
             httpServer = HttpServer.create(new InetSocketAddress(port), 0);
             
             // Context + Handler
+            //server.createContext("/users", new UserHandler());
+            //server.createContext("/maps", new MapHandler());
+
+            // Test Handler
+
+            server.createContext("/test", new TestHandler());
 
             // Create Default Executor
             httpServer.setExecutor(null);

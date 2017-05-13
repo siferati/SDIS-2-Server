@@ -11,6 +11,8 @@ import java.sql.Connection;
 public class Handler implements HttpHandler {
 
     protected Connection SQLConnection;
+    protected String AND_DELIMITER = "&";
+    protected String EQUAL_DELIMITER = "=";
 
     public Handler (Connection sqlConn) {
         this.SQLConnection = sqlConn;

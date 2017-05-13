@@ -17,9 +17,9 @@ public class GameServer {
         try {
 
             //TODO: change path!
-            String path = "";
-            //Class.forName("org.sqlite.JDBC");
-            //sqlConn = DriverManager.getConnection(path);
+            String path = "jdbc:sqlite:../db/maps.db";
+            Class.forName("org.sqlite.JDBC");
+            sqlConn = DriverManager.getConnection(path);
 
         } catch (Exception e ){
             System.err.println("Couldn't open database successfully!");

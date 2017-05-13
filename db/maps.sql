@@ -17,7 +17,7 @@ CREATE TABLE Map (
 
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    dungeon_master INTEGER REFERENCES UserAcc(id),
+    owner INTEGER REFERENCES UserAcc(id),
     rating INTEGER
 
 );

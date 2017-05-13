@@ -1,16 +1,34 @@
 import handler.MapHandler;
 
-import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
+import com.sun.net.httpserver.HttpServer;
 import java.net.InetSocketAddress;
+import java.sql.*;
 
 public class GameServer {
 
     private static HttpServer httpServer;
     private static int port = 8000;
+    private static Connection sqlConn;
 
     public static void main (String[] args){
 
+        // Database try
+        try {
+
+            //TODO: change path!
+            String path = "";
+            Class.forName("org.sqlite.JDBC");
+            sqlConn = DriverManager.getConnection(path);
+
+        } catch (Exception e ){
+            System.err.println("Couldn't open database successfully!");
+            return;
+        }
+
+        System.out.println("Database opened successfully.");
+
+        // Server try
         try {
             
             // Create Server
@@ -18,7 +36,7 @@ public class GameServer {
             
             // Context + Handler
             //server.createContext("/users", new UserHandler());
-            server.createContext("/maps", new MapHandler());
+            httpServer.createContext("/maps", new MapHandler(sqlConn));
 
             // Create Default Executor
             httpServer.setExecutor(null);

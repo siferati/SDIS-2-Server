@@ -2,7 +2,13 @@ package handler;
 
 import com.sun.net.httpserver.HttpExchange;
 
+import java.sql.*;
+
 public class MapHandler extends Handler {
+
+    public MapHandler(Connection SQLconn) {
+        super(SQLconn);
+    }
 
     @Override
     public void handle(HttpExchange t) { 

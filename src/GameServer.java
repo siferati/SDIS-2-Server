@@ -1,4 +1,5 @@
 import handler.MapHandler;
+import handler.UserAccHandler;
 
 import java.io.IOException;
 import com.sun.net.httpserver.HttpServer;
@@ -35,7 +36,7 @@ public class GameServer {
             httpServer = HttpServer.create(new InetSocketAddress(port), 0);
             
             // Context + Handler
-            //server.createContext("/users", new UserHandler());
+            httpServer.createContext("/users", new UserAccHandler(sqlConn));
             httpServer.createContext("/maps", new MapHandler(sqlConn));
 
             // Create Default Executor

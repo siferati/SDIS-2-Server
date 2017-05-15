@@ -1,9 +1,16 @@
 package handler;
 
 import com.sun.net.httpserver.HttpExchange;
+
+import jdk.nashorn.internal.ir.ObjectNode;
+
 import java.util.HashMap;
 
 import java.sql.*;
+
+import org.json.*;
+
+import java.io.*;
 
 public class MapHandler extends Handler {
 
@@ -43,7 +50,43 @@ public class MapHandler extends Handler {
 
         HashMap<String, String> GETparams = this.getGETparams(t);
 
-        // selects, wtv
+        if(GETparams.get("id") == null){
+            return;
+        }
+
+        String query = "SELECT * FROM Map WHERE id = ?";
+
+        PreparedStatement stmt;
+        try{
+            stmt = SQLConnection.prepareStatement(query);
+            stmt.setString(1, GETparams.get("id"));
+        }catch(Exception e){
+            System.out.println("Error creating statement.");
+            return;
+        }
+
+        ResultSet rs;
+        try{
+            rs = stmt.executeQuery();
+        }catch(Exception e){
+            System.out.println("Error accessing database.");
+            return;
+        }
+
+        try{
+            int total_rows = rs.getMetaData().getColumnCount();
+            JSONObject obj = new JSONObject();
+            for(int i = 0 ; i < total_rows ; i++){
+                obj.put(rs.getMetaData().getColumnLabel(i+1).toLowerCase(),rs.getObject(i+1));
+            }
+            
+            t.sendResponseHeaders(200,obj.length());
+            OutputStream os = t.getResponseBody();
+            os.write(obj.toString().getBytes());
+            os.close();
+        }catch(Exception e){
+
+        }
     }
 
     private void postMap(HttpExchange t){

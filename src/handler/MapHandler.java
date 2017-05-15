@@ -1,15 +1,9 @@
 package handler;
 
 import com.sun.net.httpserver.HttpExchange;
-
-import jdk.nashorn.internal.ir.ObjectNode;
-
+import org.json.simple.JSONObject;
 import java.util.HashMap;
-
 import java.sql.*;
-
-import org.json.*;
-
 import java.io.*;
 
 public class MapHandler extends Handler {
@@ -80,12 +74,11 @@ public class MapHandler extends Handler {
                 obj.put(rs.getMetaData().getColumnLabel(i+1).toLowerCase(),rs.getObject(i+1));
             }
             
-            t.sendResponseHeaders(200,obj.length());
-            OutputStream os = t.getResponseBody();
-            os.write(obj.toString().getBytes());
-            os.close();
-        }catch(Exception e){
+            this.sendHttpResponse(t,200,obj.toString());
 
+        }catch(Exception e){
+            System.err.println("Exception caught trying to send JSONobject");
+            return;
         }
     }
 

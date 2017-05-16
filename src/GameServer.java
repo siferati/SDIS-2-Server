@@ -21,7 +21,10 @@ public class GameServer {
             String path = "jdbc:sqlite:../db/maps.db";
             Class.forName("org.sqlite.JDBC");
             sqlConn = DriverManager.getConnection(path);
-
+            if(sqlConn == null){
+                System.err.println("Couldn't open database successfully!");
+                return;
+            }
         } catch (Exception e ){
             System.err.println("Couldn't open database successfully!");
             return;

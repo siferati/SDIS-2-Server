@@ -1,7 +1,6 @@
 package handler;
 
-import java.io.OutputStream;
-import java.io.IOException;
+import java.io.*;
 
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
@@ -32,9 +31,11 @@ public class Handler implements HttpHandler {
         t.sendResponseHeaders(code, response.length());
         
         // Write it
-        OutputStream os = t.getResponseBody();
-        os.write(response.getBytes());
-        os.close();
+        if(response.length() != 0){
+            OutputStream os = t.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+        }
 
     } 
 
@@ -53,6 +54,25 @@ public class Handler implements HttpHandler {
             }
         }
         return queryPairs;
+    }
+
+    protected String getBodyToString(HttpExchange t){
+        String value = null;
+        try{
+            InputStream in = t.getRequestBody();
+            BufferedInputStream bin = new BufferedInputStream(in);
+
+            byte[] content = new byte[2048];
+            int bytesread;
+            value = "";
+            while((bytesread = in.read(content)) != -1){
+                value = new String(content,0,bytesread);
+            }
+            
+        }catch(Exception e){
+            System.err.println("Error reading body");
+        }
+        return value;
     }
 
 }

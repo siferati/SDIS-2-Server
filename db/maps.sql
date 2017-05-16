@@ -3,15 +3,14 @@ PRAGMA foreign_keys = ON;
 DROP TABLE IF EXISTS UserAcc;
 CREATE TABLE UserAcc(
     id INTEGER PRIMARY KEY,
-    username TEXT NOT NULL,
-    pass_hash TEXT NOT NULL,
-    email TEXT NOT NULL
+    username TEXT UNIQUE NOT NULL,
+    pass_hash TEXT NOT NULL
 );
 
 DROP TABLE IF EXISTS Map;
 CREATE TABLE Map(
     id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
+    name TEXT UNIQUE NOT NULL,
     owner INTEGER REFERENCES UserAcc(id),
     startlat REAL NOT NULL,
     startlng REAL NOT NULL,
@@ -27,10 +26,10 @@ CREATE TABLE MapLine(
     map_id INTEGER REFERENCES Map(id) ON DELETE CASCADE
 );
 
-INSERT INTO UserAcc (id,username,pass_hash,email) VALUES(1,'user1','ABC','user1@generic.pt');
-INSERT INTO UserAcc (id,username,pass_hash,email) VALUES(2,'user2','ABC','user2@generic.pt');
-INSERT INTO UserAcc (id,username,pass_hash,email) VALUES(3,'user3','ABC','user3@generic.pt');
-INSERT INTO UserAcc (id,username,pass_hash,email) VALUES(4,'user4','ABC','user4@generic.pt');
+INSERT INTO UserAcc (id,username,pass_hash) VALUES(1,'user1','ABC');
+INSERT INTO UserAcc (id,username,pass_hash) VALUES(2,'user2','ABC');
+INSERT INTO UserAcc (id,username,pass_hash) VALUES(3,'user3','ABC');
+INSERT INTO UserAcc (id,username,pass_hash) VALUES(4,'user4','ABC');
 
 INSERT INTO Map (id,name,owner,startlat,startlng,finishlat,finishlng,rating) VALUES(1,'mapa1',1,1.123456,1.345678,1.123456,1.345678,10);
 INSERT INTO Map (id,name,owner,startlat,startlng,finishlat,finishlng,rating) VALUES(2,'mapa2',2,1.123457,1.345679,1.123456,1.345678,9);

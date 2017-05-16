@@ -64,6 +64,11 @@ public class MapHandler extends Handler {
             stmt = SQLConnection.prepareStatement(query);
             stmt.setInt(1, Integer.parseInt(GETparams.get("id")));
             rs = stmt.executeQuery();
+            if(!rs.next()){
+                System.out.println("Map doesnt exist");
+                this.sendHttpResponse(t,404,"");
+                return;
+            }
             //Get map lines
             stmt2 = SQLConnection.prepareStatement(query2);
             stmt2.setInt(1, Integer.parseInt(GETparams.get("id")));
@@ -106,7 +111,7 @@ public class MapHandler extends Handler {
             
 
         }catch(Exception e){
-            System.err.println("Exception caught trying to send JSONobject");
+            System.err.println("Couldn't send http response.'");
             return;
         }
     }
@@ -120,7 +125,40 @@ public class MapHandler extends Handler {
     }
 
     private void deleteMap(HttpExchange t){
-        System.out.println("DELETE " + t.getRequestURI());
+        try{
+            String value = this.getBodyToString(t);
+            System.out.println(value);
+            JSONObject o = new JSONObject(value);
+            String mapName = o.getString("mapname");
+            String userName = o.getString("username");
+            String userHash = o.getString("userhash");
+            //Statement to check if password is correct
+            String checkPassword = "SELECT id,pass_hash FROM UserAcc WHERE username = ?";
+            String deleteMap = "DELETE FROM Map WHERE name = ? AND owner = ?";
+            //Retrieve user id and password
+            PreparedStatement stmt = SQLConnection.prepareStatement(checkPassword);
+            stmt.setString(1,userName);
+            ResultSet rs;
+            rs = stmt.executeQuery();
+            rs.next();
+            //If password is not correct, return
+            System.out.println("got here");
+            if(!rs.getString("pass_hash").equals(userHash)){
+                return;
+            }
+            System.out.println("got here");
+            //Delete map with name and user id
+            PreparedStatement stmt2 = SQLConnection.prepareStatement(deleteMap);
+            stmt2.setString(1,mapName);
+            stmt2.setInt(2,rs.getInt("id"));
+            stmt2.executeUpdate();
+
+            this.sendHttpResponse(t,204,"");
+        }catch(Exception e){
+            System.err.println("Error deleting");
+            return;
+        }
+        
     }
 
 }

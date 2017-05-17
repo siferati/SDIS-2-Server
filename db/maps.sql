@@ -26,22 +26,22 @@ CREATE TABLE MapLine(
 );
 
 
-INSERT INTO UserAcc (id,username,pass_hash) VALUES(1,'user1','ABC');
-INSERT INTO UserAcc (id,username,pass_hash) VALUES(2,'user2','ABC');
-INSERT INTO UserAcc (id,username,pass_hash) VALUES(3,'user3','ABC');
-INSERT INTO UserAcc (id,username,pass_hash) VALUES(4,'user4','ABC');
+INSERT INTO UserAcc (username,pass_hash) VALUES('user1','ABC');
+INSERT INTO UserAcc (username,pass_hash) VALUES('user2','ABC');
+INSERT INTO UserAcc (username,pass_hash) VALUES('user3','ABC');
+INSERT INTO UserAcc (username,pass_hash) VALUES('user4','ABC');
 
-INSERT INTO Map (id,name,owner,startlat,startlng,finishlat,finishlng) VALUES(1,'mapa1',1,1.123456,1.345678,1.123456,1.345678);
-INSERT INTO Map (id,name,owner,startlat,startlng,finishlat,finishlng) VALUES(2,'mapa2',2,1.123457,1.345679,1.123456,1.345678);
-INSERT INTO Map (id,name,owner,startlat,startlng,finishlat,finishlng) VALUES(3,'mapa3',2,1.123458,1.345681,1.123456,1.345678);
-INSERT INTO Map (id,name,owner,startlat,startlng,finishlat,finishlng) VALUES(4,'mapa4',3,1.123459,1.345682,1.123456,1.345678);
-INSERT INTO Map (id,name,owner,startlat,startlng,finishlat,finishlng) VALUES(5,'mapa5',1,1.123411,1.345683,1.123456,1.345678);
+INSERT INTO Map (name,owner,startlat,startlng,finishlat,finishlng) VALUES('mapa1',1,1.123456,1.345678,1.123456,1.345678);
+INSERT INTO Map (name,owner,startlat,startlng,finishlat,finishlng) VALUES('mapa2',2,1.123457,1.345679,1.123456,1.345678);
+INSERT INTO Map (name,owner,startlat,startlng,finishlat,finishlng) VALUES('mapa3',2,1.123458,1.345681,1.123456,1.345678);
+INSERT INTO Map (name,owner,startlat,startlng,finishlat,finishlng) VALUES('mapa4',3,1.123459,1.345682,1.123456,1.345678);
+INSERT INTO Map (name,owner,startlat,startlng,finishlat,finishlng) VALUES('mapa5',1,1.123411,1.345683,1.123456,1.345678);
 
-INSERT INTO MapLine (id,draw,map_id) VALUES(1,'OLA',1);
-INSERT INTO MapLine (id,draw,map_id) VALUES(2,'OLAA',1);
-INSERT INTO MapLine (id,draw,map_id) VALUES(3,'OLAAA',2);
-INSERT INTO MapLine (id,draw,map_id) VALUES(4,'OLAAAA',3);
-INSERT INTO MapLine (id,draw,map_id) VALUES(5,'OLAAAAA',3);
-INSERT INTO MapLine (id,draw,map_id) VALUES(6,'OLAAAAAA',4);
-INSERT INTO MapLine (id,draw,map_id) VALUES(7,'OLAAAAAAA',5);
+INSERT INTO MapLine (draw,map_id) VALUES('OLA',1);
+INSERT INTO MapLine (draw,map_id) VALUES('OLAA',1);
+INSERT INTO MapLine (draw,map_id) VALUES('OLAAA',2);
+INSERT INTO MapLine (draw,map_id) VALUES('OLAAAA',3);
+INSERT INTO MapLine (draw,map_id) VALUES('OLAAAAA',3);
+INSERT INTO MapLine (draw,map_id) VALUES('OLAAAAAA',4);
+INSERT INTO MapLine (draw,map_id) VALUES('OLAAAAAAA',5);
 

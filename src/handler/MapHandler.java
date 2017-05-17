@@ -44,11 +44,11 @@ public class MapHandler extends Handler {
 
         HashMap<String, String> GETparams = this.getGETparams(t);
 
-        if(GETparams.get("id") == null){
+        if(GETparams.get("name") == null){
             return;
         }
         //Get map
-        String query = "SELECT * FROM Map WHERE id = ?";
+        String query = "SELECT * FROM Map WHERE name = ?";
         String query2 = "SELECT * FROM MapLine WHERE map_id = ?";
         String query3 = "SELECT username FROM UserAcc WHERE id = ?";
         PreparedStatement stmt;
@@ -62,7 +62,7 @@ public class MapHandler extends Handler {
         try{
             //Get map
             stmt = SQLConnection.prepareStatement(query);
-            stmt.setInt(1, Integer.parseInt(GETparams.get("id")));
+            stmt.setString(1, GETparams.get("name"));
             rs = stmt.executeQuery();
             if(!rs.next()){
                 System.out.println("Map doesnt exist");
@@ -71,7 +71,7 @@ public class MapHandler extends Handler {
             }
             //Get map lines
             stmt2 = SQLConnection.prepareStatement(query2);
-            stmt2.setInt(1, Integer.parseInt(GETparams.get("id")));
+            stmt2.setInt(1, rs.getInt("id"));
             rs2 = stmt2.executeQuery();
             //Get name of owner of map
             stmt3 = SQLConnection.prepareStatement(query3);
@@ -110,6 +110,7 @@ public class MapHandler extends Handler {
             
 
         }catch(Exception e){
+            this.sendHttpResponse(t,404,"");
             System.err.println("Couldn't send http response.'");
             return;
         }
@@ -132,10 +133,11 @@ public class MapHandler extends Handler {
             double startlng = mapinfo.getDouble("startlng");
             double finishlat = mapinfo.getDouble("finishlat");
             double finishlng = mapinfo.getDouble("finishlng");
-            
+
             //Statement to check if password is correct
             String checkPassword = "SELECT id,pass_hash FROM UserAcc WHERE username = ?";
             String insertMap = "INSERT INTO Map (name,owner,startlat,startlng,finishlat,finishlng) VALUES(?,?,?,?,?,?)";
+            String insertLine = "INSERT INTO MapLine (draw,map_id) VALUES (?,?)";
             //Retrieve user id and password
             PreparedStatement stmt = SQLConnection.prepareStatement(checkPassword);
             stmt.setString(1,userName);
@@ -147,6 +149,7 @@ public class MapHandler extends Handler {
                 System.err.println("Invalid user");
                 return;
             }
+
             PreparedStatement stmt2 = SQLConnection.prepareStatement(insertMap);
             stmt2.setString(1,mapname);
             stmt2.setInt(2,rs.getInt("id"));
@@ -154,13 +157,29 @@ public class MapHandler extends Handler {
             stmt2.setDouble(4,startlng);
             stmt2.setDouble(5,finishlat);
             stmt2.setDouble(6,finishlng);
+
             stmt2.executeUpdate();
 
+            int mapId = -1;
+
+            ResultSet generatedKeys = stmt2.getGeneratedKeys();
+            if(generatedKeys.next()){
+                mapId = generatedKeys.getInt(1);
+            }
+            if(mapId == -1){
+                return;
+            }
+
+            PreparedStatement stmt3 = SQLConnection.prepareStatement(insertLine); 
             JSONArray lines = o.getJSONArray("lines");
             for(int i = 0;i < lines.length();i++){
-                JSONObject line = lines.get(i);
+                JSONObject line = (JSONObject)lines.get(i);
+                stmt3.setString(1,line.getString("draw"));
+                stmt3.setInt(2,mapId);
+                stmt3.executeUpdate();
             }
         }catch(Exception e){
+            this.sendHttpResponse(t,409,"");
             System.err.println("Error putting");
             return;
         }
@@ -195,6 +214,7 @@ public class MapHandler extends Handler {
 
             this.sendHttpResponse(t,204,"");
         }catch(Exception e){
+            this.sendHttpResponse(t,404,"");
             System.err.println("Error deleting");
             return;
         }

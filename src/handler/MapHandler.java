@@ -83,7 +83,6 @@ public class MapHandler extends Handler {
             JSONArray lines = new JSONArray();
             JSONObject singline;
             
-            obj.put("rating",rs.getInt("rating"));
             obj.put("finishlat",rs.getFloat("finishlat"));
             obj.put("finishlng",rs.getFloat("finishlng"));
             obj.put("startlat",rs.getFloat("startlng"));
@@ -121,13 +120,55 @@ public class MapHandler extends Handler {
     }
 
     private void putMap(HttpExchange t){
-        System.out.println("PUT " + t.getRequestURI());
+        try{
+            String value = this.getBodyToString(t);
+            JSONObject o = new JSONObject(value);
+            JSONObject mapinfo = o.getJSONObject("map");
+
+            String userName = o.getString("username");
+            String userHash = o.getString("userhash");
+            String mapname = mapinfo.getString("name");
+            double startlat = mapinfo.getDouble("startlat");
+            double startlng = mapinfo.getDouble("startlng");
+            double finishlat = mapinfo.getDouble("finishlat");
+            double finishlng = mapinfo.getDouble("finishlng");
+            
+            //Statement to check if password is correct
+            String checkPassword = "SELECT id,pass_hash FROM UserAcc WHERE username = ?";
+            String insertMap = "INSERT INTO Map (name,owner,startlat,startlng,finishlat,finishlng) VALUES(?,?,?,?,?,?)";
+            //Retrieve user id and password
+            PreparedStatement stmt = SQLConnection.prepareStatement(checkPassword);
+            stmt.setString(1,userName);
+            ResultSet rs;
+            rs = stmt.executeQuery();
+            rs.next();
+            //If password is not correct, return
+            if(!rs.getString("pass_hash").equals(userHash)){
+                System.err.println("Invalid user");
+                return;
+            }
+            PreparedStatement stmt2 = SQLConnection.prepareStatement(insertMap);
+            stmt2.setString(1,mapname);
+            stmt2.setInt(2,rs.getInt("id"));
+            stmt2.setDouble(3,startlat);
+            stmt2.setDouble(4,startlng);
+            stmt2.setDouble(5,finishlat);
+            stmt2.setDouble(6,finishlng);
+            stmt2.executeUpdate();
+
+            JSONArray lines = o.getJSONArray("lines");
+            for(int i = 0;i < lines.length();i++){
+                JSONObject line = lines.get(i);
+            }
+        }catch(Exception e){
+            System.err.println("Error putting");
+            return;
+        }
     }
 
     private void deleteMap(HttpExchange t){
         try{
             String value = this.getBodyToString(t);
-            System.out.println(value);
             JSONObject o = new JSONObject(value);
             String mapName = o.getString("mapname");
             String userName = o.getString("username");
@@ -142,11 +183,10 @@ public class MapHandler extends Handler {
             rs = stmt.executeQuery();
             rs.next();
             //If password is not correct, return
-            System.out.println("got here");
             if(!rs.getString("pass_hash").equals(userHash)){
+                System.err.println("Invalid user");
                 return;
             }
-            System.out.println("got here");
             //Delete map with name and user id
             PreparedStatement stmt2 = SQLConnection.prepareStatement(deleteMap);
             stmt2.setString(1,mapName);

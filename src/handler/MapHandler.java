@@ -110,7 +110,11 @@ public class MapHandler extends Handler {
             
 
         }catch(Exception e){
-            this.sendHttpResponse(t,404,"");
+            try{
+                this.sendHttpResponse(t,404,"");
+            }catch(Exception e2){
+
+            }
             System.err.println("Couldn't send http response.'");
             return;
         }
@@ -122,6 +126,7 @@ public class MapHandler extends Handler {
 
     private void putMap(HttpExchange t){
         try{
+            System.out.println("PUT " + t.getRequestURI());
             String value = this.getBodyToString(t);
             JSONObject o = new JSONObject(value);
             JSONObject mapinfo = o.getJSONObject("map");
@@ -149,6 +154,8 @@ public class MapHandler extends Handler {
                 System.err.println("Invalid user");
                 return;
             }
+            //Begin transaction
+            SQLConnection.setAutoCommit(false);
 
             PreparedStatement stmt2 = SQLConnection.prepareStatement(insertMap);
             stmt2.setString(1,mapname);
@@ -178,11 +185,24 @@ public class MapHandler extends Handler {
                 stmt3.setInt(2,mapId);
                 stmt3.executeUpdate();
             }
+            //Send transaction
+            SQLConnection.commit();
         }catch(Exception e){
-            this.sendHttpResponse(t,409,"");
+            try{
+                this.sendHttpResponse(t,409,"");
+            }catch(Exception e2){
+
+            }
             System.err.println("Error putting");
             return;
         }
+        //Turn on auto commit again, after transaction concluded or failed
+        try{
+            SQLConnection.setAutoCommit(true);
+        }catch(Exception e){
+
+        }
+        
     }
 
     private void deleteMap(HttpExchange t){
@@ -214,7 +234,11 @@ public class MapHandler extends Handler {
 
             this.sendHttpResponse(t,204,"");
         }catch(Exception e){
-            this.sendHttpResponse(t,404,"");
+            try{
+                this.sendHttpResponse(t,404,"");
+            }catch(Exception e2){
+
+            }
             System.err.println("Error deleting");
             return;
         }

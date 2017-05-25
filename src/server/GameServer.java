@@ -1,3 +1,5 @@
+package server;
+
 import handler.MapHandler;
 import handler.UserAccHandler;
 

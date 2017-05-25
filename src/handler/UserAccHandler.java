@@ -1,9 +1,11 @@
 package handler;
 
 import com.sun.net.httpserver.HttpExchange;
+import org.json.*;
 import java.util.HashMap;
-
 import java.sql.*;
+import java.io.*;
+import db.*;
 
 public class UserAccHandler extends Handler {
 
@@ -45,9 +47,36 @@ public class UserAccHandler extends Handler {
 
         // selects, wtv
     }
-
+    //Login
     private void postUser(HttpExchange t){
-        System.out.println("POST " + t.getRequestURI());
+        try{
+            System.out.println("POST " + t.getRequestURI());
+
+            String value = this.getBodyToString(t);
+            JSONObject o = new JSONObject(value);
+
+            String userName = o.getString("username");
+            String userHash = o.getString("userhash");
+
+             //Check if valid user
+            int userId = Users.checkLoginCorrect(SQLConnection,userName,userHash);
+            //If password is not correct, return
+            if(userId < 1){
+                System.err.println("Invalid user");
+                this.sendHttpResponse(t,403,"");
+                return;
+            }
+
+            sendHttpResponse(t,303,"");
+        }catch(Exception e){
+            try{
+                this.sendHttpResponse(t,404,"");
+            }catch(Exception e2){
+
+            }
+            System.err.println("Error on post");
+            return;
+        }
     }
 
     private void putUser(HttpExchange t){

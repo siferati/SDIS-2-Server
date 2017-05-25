@@ -130,9 +130,6 @@ public class MapHandler extends Handler {
             double finishlat = mapinfo.getDouble("finishlat");
             double finishlng = mapinfo.getDouble("finishlng");
 
-            //Statement to check if password is correct
-            String insertMap = "INSERT INTO Map (name,owner,startlat,startlng,finishlat,finishlng) VALUES(?,?,?,?,?,?)";
-            String insertLine = "INSERT INTO MapLine (draw,map_id) VALUES (?,?)";
             //Check if valid user
             int userId = Users.checkLoginCorrect(SQLConnection,userName,userHash);
             //If password is not correct, return
@@ -141,8 +138,12 @@ public class MapHandler extends Handler {
                 this.sendHttpResponse(t,403,"");
                 return;
             }
+            //Check if map exists
+            if(Maps.getMap(SQLConnection,mapname).next()){
+                Maps.deleteMap(SQLConnection,mapname,userId);
+            }
             //Begin transaction
-            SQLConnection.setAutoCommit(false);
+            /*SQLConnection.setAutoCommit(false);*/
             //Create map
             int mapId = Maps.insertMap(SQLConnection,mapname,userId,startlat,startlng,finishlat,finishlng);
             //Check if insert wasn't successful'
@@ -156,7 +157,7 @@ public class MapHandler extends Handler {
                 Maps.insertLine(SQLConnection,line.getString("draw"),mapId);
             }
             //Send transaction
-            SQLConnection.commit();
+            /* SQLConnection.commit(); */
             //Send created http response
             this.sendHttpResponse(t,201,"");
         }catch(Exception e){

@@ -58,7 +58,7 @@ public class UserAccHandler extends Handler {
             String userName = o.getString("username");
             String userHash = o.getString("userhash");
 
-             //Check if valid user
+            //Check if valid user
             int userId = Users.checkLoginCorrect(SQLConnection,userName,userHash);
             //If password is not correct, return
             if(userId < 1){
@@ -80,7 +80,30 @@ public class UserAccHandler extends Handler {
     }
 
     private void putUser(HttpExchange t){
-        System.out.println("PUT " + t.getRequestURI());
+        try{
+            System.out.println("PUT " + t.getRequestURI());
+
+            String value = this.getBodyToString(t);
+            JSONObject o = new JSONObject(value);
+
+            String userName = o.getString("username");
+            String userHash = o.getString("userhash");
+
+            if(!Users.insertUser(SQLConnection,userName,userHash)){
+                System.err.println("User already exists");
+                this.sendHttpResponse(t,409,"");
+                return;
+            }
+            this.sendHttpResponse(t,201,"");
+        }catch(Exception e){
+            try{
+                this.sendHttpResponse(t,404,"");
+            }catch(Exception e2){
+
+            }
+            System.err.println("Error on post");
+            return;
+        }
     }
 
     private void deleteUser(HttpExchange t){

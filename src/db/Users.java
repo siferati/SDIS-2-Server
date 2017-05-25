@@ -17,6 +17,18 @@ public class Users{
         }
         return rs.getInt("id");
     }
+
+    public static boolean insertUser(Connection c,String user,String hash) throws Exception{
+        String query = "INSERT INTO UserAcc(username,pass_hash) VALUES (?,?)";
+        PreparedStatement stmt;
+        stmt = c.prepareStatement(query);
+        stmt.setString(1,user);
+        stmt.setString(2,hash);
+        
+        return stmt.executeUpdate() != 0;
+    }
+
+
     public static ResultSet getUsernameFromId(Connection c,int id) throws Exception{
         String query = "SELECT username FROM UserAcc WHERE id = ?";
         PreparedStatement stmt;

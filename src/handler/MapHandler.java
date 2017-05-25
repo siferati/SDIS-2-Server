@@ -5,6 +5,7 @@ import org.json.*;
 import java.util.HashMap;
 import java.sql.*;
 import java.io.*;
+import db.*;
 
 public class MapHandler extends Handler {
 
@@ -43,40 +44,37 @@ public class MapHandler extends Handler {
         System.out.println("GET " + t.getRequestURI());
 
         HashMap<String, String> GETparams = this.getGETparams(t);
-
+        //Check if map name was sent
         if(GETparams.get("name") == null){
             return;
         }
-        //Get map
-        String query = "SELECT * FROM Map WHERE name = ?";
-        String query2 = "SELECT * FROM MapLine WHERE map_id = ?";
-        String query3 = "SELECT username FROM UserAcc WHERE id = ?";
-        PreparedStatement stmt;
-        PreparedStatement stmt2;
-        PreparedStatement stmt3;
+        //Map
         ResultSet rs;
+        //Map lines
         ResultSet rs2;
+        //Username from user id
         ResultSet rs3;
+        //Response json object
         JSONObject all;
+        //Response string
         String response;
         try{
             //Get map
-            stmt = SQLConnection.prepareStatement(query);
-            stmt.setString(1, GETparams.get("name"));
-            rs = stmt.executeQuery();
+            rs = Maps.getMap(SQLConnection,GETparams.get("name"));
             if(!rs.next()){
-                System.out.println("Map doesnt exist");
+                System.out.println("Map doesn't exist");
                 this.sendHttpResponse(t,404,"");
                 return;
             }
             //Get map lines
-            stmt2 = SQLConnection.prepareStatement(query2);
-            stmt2.setInt(1, rs.getInt("id"));
-            rs2 = stmt2.executeQuery();
+            rs2 = Maps.getMapLines(SQLConnection,rs.getInt("id"));
             //Get name of owner of map
-            stmt3 = SQLConnection.prepareStatement(query3);
-            stmt3.setInt(1, rs.getInt("owner"));
-            rs3 = stmt3.executeQuery();
+            rs3 = Users.getUsernameFromId(SQLConnection,rs.getInt("owner"));
+            if(!rs.next()){
+                System.out.println("User doesn't exist");
+                this.sendHttpResponse(t,404,"");
+                return;
+            }
             //Making json
             all = new JSONObject();
             JSONObject obj = new JSONObject();
@@ -98,24 +96,17 @@ public class MapHandler extends Handler {
                 singline.put("draw",rs2.getString("draw"));
                 lines.put(singline);
             }
-            all.put("lines",lines);     
+            all.put("lines",lines);
+            response = all.toString();
+            //Send 200 as answer
+            this.sendHttpResponse(t,200,response);  
         }catch(Exception e){
             System.out.println("Error accessing database.");
-            return;
-        }
-        response = all.toString();
-
-        try{
-            this.sendHttpResponse(t,200,response);
-            
-
-        }catch(Exception e){
             try{
-                this.sendHttpResponse(t,404,"");
+                this.sendHttpResponse(t,409,"");
             }catch(Exception e2){
 
             }
-            System.err.println("Couldn't send http response.'");
             return;
         }
     }
@@ -140,53 +131,34 @@ public class MapHandler extends Handler {
             double finishlng = mapinfo.getDouble("finishlng");
 
             //Statement to check if password is correct
-            String checkPassword = "SELECT id,pass_hash FROM UserAcc WHERE username = ?";
             String insertMap = "INSERT INTO Map (name,owner,startlat,startlng,finishlat,finishlng) VALUES(?,?,?,?,?,?)";
             String insertLine = "INSERT INTO MapLine (draw,map_id) VALUES (?,?)";
-            //Retrieve user id and password
-            PreparedStatement stmt = SQLConnection.prepareStatement(checkPassword);
-            stmt.setString(1,userName);
-            ResultSet rs;
-            rs = stmt.executeQuery();
-            rs.next();
+            //Check if valid user
+            int userId = Users.checkLoginCorrect(SQLConnection,userName,userHash);
             //If password is not correct, return
-            if(!rs.getString("pass_hash").equals(userHash)){
+            if(userId < 1){
                 System.err.println("Invalid user");
+                this.sendHttpResponse(t,403,"");
                 return;
             }
             //Begin transaction
             SQLConnection.setAutoCommit(false);
-
-            PreparedStatement stmt2 = SQLConnection.prepareStatement(insertMap);
-            stmt2.setString(1,mapname);
-            stmt2.setInt(2,rs.getInt("id"));
-            stmt2.setDouble(3,startlat);
-            stmt2.setDouble(4,startlng);
-            stmt2.setDouble(5,finishlat);
-            stmt2.setDouble(6,finishlng);
-
-            stmt2.executeUpdate();
-
-            int mapId = -1;
-
-            ResultSet generatedKeys = stmt2.getGeneratedKeys();
-            if(generatedKeys.next()){
-                mapId = generatedKeys.getInt(1);
-            }
+            //Create map
+            int mapId = Maps.insertMap(SQLConnection,mapname,userId,startlat,startlng,finishlat,finishlng);
+            //Check if insert wasn't successful'
             if(mapId == -1){
                 return;
             }
-
-            PreparedStatement stmt3 = SQLConnection.prepareStatement(insertLine); 
+            //Create lines
             JSONArray lines = o.getJSONArray("lines");
             for(int i = 0;i < lines.length();i++){
                 JSONObject line = (JSONObject)lines.get(i);
-                stmt3.setString(1,line.getString("draw"));
-                stmt3.setInt(2,mapId);
-                stmt3.executeUpdate();
+                Maps.insertLine(SQLConnection,line.getString("draw"),mapId);
             }
             //Send transaction
             SQLConnection.commit();
+            //Send created http response
+            this.sendHttpResponse(t,201,"");
         }catch(Exception e){
             try{
                 this.sendHttpResponse(t,409,"");
@@ -207,39 +179,35 @@ public class MapHandler extends Handler {
 
     private void deleteMap(HttpExchange t){
         try{
+            System.out.println("DELETE " + t.getRequestURI());
             String value = this.getBodyToString(t);
             JSONObject o = new JSONObject(value);
             String mapName = o.getString("mapname");
             String userName = o.getString("username");
             String userHash = o.getString("userhash");
             //Statement to check if password is correct
-            String checkPassword = "SELECT id,pass_hash FROM UserAcc WHERE username = ?";
-            String deleteMap = "DELETE FROM Map WHERE name = ? AND owner = ?";
-            //Retrieve user id and password
-            PreparedStatement stmt = SQLConnection.prepareStatement(checkPassword);
-            stmt.setString(1,userName);
-            ResultSet rs;
-            rs = stmt.executeQuery();
-            rs.next();
+            int userId = Users.checkLoginCorrect(SQLConnection,userName,userHash);
             //If password is not correct, return
-            if(!rs.getString("pass_hash").equals(userHash)){
+            if(userId < 1){
                 System.err.println("Invalid user");
+                this.sendHttpResponse(t,403,"");
                 return;
             }
             //Delete map with name and user id
-            PreparedStatement stmt2 = SQLConnection.prepareStatement(deleteMap);
-            stmt2.setString(1,mapName);
-            stmt2.setInt(2,rs.getInt("id"));
-            stmt2.executeUpdate();
-
+            if(!Maps.deleteMap(SQLConnection,mapName,userId)){
+                System.out.println("Map doesn't exist");
+                this.sendHttpResponse(t,404,"");
+                return;
+            }
+            //Send no content http response
             this.sendHttpResponse(t,204,"");
         }catch(Exception e){
+            System.err.println("Error deleting");
             try{
                 this.sendHttpResponse(t,404,"");
             }catch(Exception e2){
 
             }
-            System.err.println("Error deleting");
             return;
         }
         

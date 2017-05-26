@@ -10,15 +10,15 @@ import db.*;
 public class LoginState{
 	public String username;
 	public String userhash;
-	public String loginToken;
+	public String accessToken;
 
 	public LoginState(String username,String userhash){
 		//Assign username
 		this.username = username;
 		//Assign password
 		this.userhash = userhash;
-		//Generate random token
-		this.loginToken = LoginState.generateToken();
+		//Generate random acess token
+		this.accessToken = LoginState.generateToken();
 	}
 
 	public static String generateToken(){

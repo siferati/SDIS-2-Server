@@ -143,7 +143,7 @@ public class MapHandler extends Handler {
                 Maps.deleteMap(SQLConnection,mapname,userId);
             }
             //Begin transaction
-            /*SQLConnection.setAutoCommit(false);*/
+            SQLConnection.setAutoCommit(false);
             //Create map
             int mapId = Maps.insertMap(SQLConnection,mapname,userId,startlat,startlng,finishlat,finishlng);
             //Check if insert wasn't successful'
@@ -157,9 +157,9 @@ public class MapHandler extends Handler {
                 Maps.insertLine(SQLConnection,line.getString("draw"),mapId);
             }
             //Send transaction
-            /* SQLConnection.commit(); */
+            SQLConnection.commit();
             //Send created http response
-            this.sendHttpResponse(t,201,"");
+            this.sendHttpResponse(t,201,Integer.valueOf(mapId).toString());
         }catch(Exception e){
             try{
                 this.sendHttpResponse(t,409,"");

@@ -32,4 +32,8 @@ public class Token{
 		String output = sb.toString();
 		value = output;
 	}
+
+    public String toString(){
+        return value;
+    }
 }

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.sql.*;
 import java.io.*;
 import db.*;
+import states.*;
 
 public class UserAccHandler extends Handler {
 
@@ -44,19 +45,21 @@ public class UserAccHandler extends Handler {
         System.out.println("GET " + t.getRequestURI());
 
         HashMap<String, String> GETparams = this.getGETparams(t);
-
-        // selects, wtv
     }
     //Login
     private void postUser(HttpExchange t){
         try{
             System.out.println("POST " + t.getRequestURI());
 
+            //Get body
             String value = this.getBodyToString(t);
             JSONObject o = new JSONObject(value);
-
+            //Username
             String userName = o.getString("username");
+            //Password
             String userHash = o.getString("userhash");
+            //Response
+            JSONObject response;
 
             //Check if valid user
             int userId = Users.checkLoginCorrect(SQLConnection,userName,userHash);
@@ -67,7 +70,19 @@ public class UserAccHandler extends Handler {
                 return;
             }
 
-            sendHttpResponse(t,303,"");
+            //If user is valid, create a session of him
+            States.loginUser(userName,userHash);
+
+            //Create response body, with username, access token and refresh token
+            LoginState state = States.getUser(userName);
+            //Build response
+            response = new JSONObject();
+
+            response.put("username",userName);
+            response.put("accesstoken",state.accessToken.toString());
+            response.put("refreshtoken",state.refreshToken.toString());
+            //Send response
+            sendHttpResponse(t,303,response.toString());
         }catch(Exception e){
             try{
                 this.sendHttpResponse(t,404,"");
@@ -108,6 +123,33 @@ public class UserAccHandler extends Handler {
 
     private void deleteUser(HttpExchange t){
         System.out.println("DELETE " + t.getRequestURI());
+        try{
+            //Get body
+            String value = this.getBodyToString(t);
+            JSONObject o = new JSONObject(value);
+            //Username
+            String userName = o.getString("username");
+            String accessToken = o.getString("accesstoken");
+            
+            //Check if user logged and access token correct
+            if(!States.userLogged(userName)){
+                System.err.println("User not logged in");
+                this.sendHttpResponse(t,403,"");
+                return;
+            }
+            if(!States.validToken(userName)){
+                System.err.println("Token expired");
+                this.sendHttpResponse(t,401,"");
+                return;
+            }
+            States.logoutUser(userName);
+            this.sendHttpResponse(t,303,"");
+            
+        }catch(Exception e){
+
+        }
+         
+
     }
 
 }

@@ -10,26 +10,23 @@ import db.*;
 public class LoginState{
 	public String username;
 	public String userhash;
-	public String accessToken;
-
+	public Token refreshToken;
+	public Token accessToken;
 	public LoginState(String username,String userhash){
 		//Assign username
 		this.username = username;
 		//Assign password
 		this.userhash = userhash;
-		//Generate random acess token
-		this.accessToken = LoginState.generateToken();
+		//Create refresh token with 24 hour expiration
+		refreshToken = new Token(60*60*24);
+		//Create access token with 15 min expiration
+		accessToken = new Token(60*15);
 	}
 
-	public static String generateToken(){
-		char[] chars = "abcdefghijklmnopqrstuvwxyz1234567890".toCharArray();
-		StringBuilder sb = new StringBuilder();
-		Random random = new Random();
-		for (int i = 0; i < 16; i++) {
-		    char c = chars[random.nextInt(chars.length)];
-		    sb.append(c);
-		}
-		String output = sb.toString();
-		return output;
+	public boolean accessTokenExpired(){
+		return accessToken.isExpired();
+	}
+	public void renewAccessToken(){
+		accessToken = new Token(60*15);
 	}
 }

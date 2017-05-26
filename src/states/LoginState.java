@@ -9,14 +9,14 @@ import db.*;
 
 public class LoginState{
 	public String username;
-	public String userhash;
+	public int userid;
 	public Token refreshToken;
 	public Token accessToken;
-	public LoginState(String username,String userhash){
+	public LoginState(String username,int user){
 		//Assign username
 		this.username = username;
 		//Assign password
-		this.userhash = userhash;
+		this.userid = userid;
 		//Create refresh token with 24 hour expiration
 		refreshToken = new Token(60*60*24);
 		//Create access token with 15 min expiration

@@ -44,7 +44,7 @@ public class UserAccHandler extends Handler {
 
         System.out.println("GET " + t.getRequestURI());
 
-        HashMap<String, String> GETparams = this.getGETparams(t);
+        //HashMap<String, String> GETparams = this.getGETparams(t);
     }
     //Login
     private void postUser(HttpExchange t){
@@ -71,7 +71,7 @@ public class UserAccHandler extends Handler {
             }
 
             //If user is valid, create a session of him
-            States.loginUser(userName,userHash);
+            States.loginUser(userName,userId);
 
             //Create response body, with username, access token and refresh token
             LoginState state = States.getUser(userName);

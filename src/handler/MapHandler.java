@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.sql.*;
 import java.io.*;
 import db.*;
-
+import states.*;
 public class MapHandler extends Handler {
 
     public MapHandler(Connection SQLconn) {
@@ -118,32 +118,38 @@ public class MapHandler extends Handler {
     private void putMap(HttpExchange t){
         try{
             System.out.println("PUT " + t.getRequestURI());
+            //Get body
             String value = this.getBodyToString(t);
             JSONObject o = new JSONObject(value);
+            
             JSONObject mapinfo = o.getJSONObject("map");
 
             String userName = o.getString("username");
-            String userHash = o.getString("userhash");
+            String accessToken = o.getString("accesstoken");
             String mapname = mapinfo.getString("name");
             double startlat = mapinfo.getDouble("startlat");
             double startlng = mapinfo.getDouble("startlng");
             double finishlat = mapinfo.getDouble("finishlat");
             double finishlng = mapinfo.getDouble("finishlng");
 
-            //Check if valid user
-            int userId = Users.checkLoginCorrect(SQLConnection,userName,userHash);
-            //If password is not correct, return
-            if(userId < 1){
-                System.err.println("Invalid user");
+            //Check if user logged and access token correct
+            if(!States.userLogged(userName)){
+                System.err.println("User not logged in");
                 this.sendHttpResponse(t,403,"");
                 return;
             }
+            if(!States.validToken(userName)){
+                System.err.println("Token expired");
+                this.sendHttpResponse(t,401,"");
+                return;
+            }
+            int userId = States.getUserId(userName);
             //Check if map exists
             if(Maps.getMap(SQLConnection,mapname).next()){
                 Maps.deleteMap(SQLConnection,mapname,userId);
             }
             //Begin transaction
-            SQLConnection.setAutoCommit(false);
+            //SQLConnection.setAutoCommit(false);
             //Create map
             int mapId = Maps.insertMap(SQLConnection,mapname,userId,startlat,startlng,finishlat,finishlng);
             //Check if insert wasn't successful'
@@ -157,7 +163,7 @@ public class MapHandler extends Handler {
                 Maps.insertLine(SQLConnection,line.getString("draw"),mapId);
             }
             //Send transaction
-            SQLConnection.commit();
+            //SQLConnection.commit();
             //Send created http response
             this.sendHttpResponse(t,201,Integer.valueOf(mapId).toString());
         }catch(Exception e){
@@ -185,15 +191,19 @@ public class MapHandler extends Handler {
             JSONObject o = new JSONObject(value);
             String mapName = o.getString("mapname");
             String userName = o.getString("username");
-            String userHash = o.getString("userhash");
-            //Statement to check if password is correct
-            int userId = Users.checkLoginCorrect(SQLConnection,userName,userHash);
-            //If password is not correct, return
-            if(userId < 1){
-                System.err.println("Invalid user");
+            String accessToken = o.getString("accesstoken");
+            //Check if user logged and access token correct
+            if(!States.userLogged(userName)){
+                System.err.println("User not logged in");
                 this.sendHttpResponse(t,403,"");
                 return;
             }
+            if(!States.validToken(userName)){
+                System.err.println("Token expired");
+                this.sendHttpResponse(t,401,"");
+                return;
+            }
+            int userId = States.getUserId(userName);
             //Delete map with name and user id
             if(!Maps.deleteMap(SQLConnection,mapName,userId)){
                 System.out.println("Map doesn't exist");

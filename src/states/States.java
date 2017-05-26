@@ -10,11 +10,11 @@ import db.*;
 public class States{
 	public static Hashtable<String,LoginState> loggedUsers;
 
-	public static void loginUser(String username,String userhash){
+	public static void loginUser(String username,int userid){
 		if(loggedUsers.get(username) != null){
 			loggedUsers.remove(username);
 		}
-		loggedUsers.put(username,new LoginState(username,userhash));
+		loggedUsers.put(username,new LoginState(username,userid));
 	}
 
 	public static LoginState getUser(String username){
@@ -23,6 +23,13 @@ public class States{
 
 	public static boolean userLogged(String username){
 		return loggedUsers.get(username) != null;
+	}
+
+	public static int getUserId(String username){
+		LoginState st = loggedUsers.get(username);
+		if(st != null){
+			return st.userid;
+		}else return -1;
 	}
 
 	public static boolean validToken(String username){

@@ -70,7 +70,7 @@ public class MapHandler extends Handler {
             rs2 = Maps.getMapLines(SQLConnection,rs.getInt("id"));
             //Get name of owner of map
             rs3 = Users.getUsernameFromId(SQLConnection,rs.getInt("owner"));
-            if(!rs.next()){
+            if(!rs3.next()){
                 System.out.println("User doesn't exist");
                 this.sendHttpResponse(t,404,"");
                 return;

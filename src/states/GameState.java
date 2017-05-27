@@ -28,9 +28,10 @@ public class GameState{
         }else return false;
     }
 
-    public void removePlayer(String username){
+    public boolean removePlayer(String username){
         if(players.get(username) != null){
             players.remove(username);
-        }
+            return true;
+        }else return false;
     }
 }

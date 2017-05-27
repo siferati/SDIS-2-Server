@@ -8,13 +8,10 @@ import java.io.*;
 import db.*;
 
 public class LoginState{
-	public String username;
 	public int userid;
 	public Token refreshToken;
 	public Token accessToken;
-	public LoginState(String username,int user){
-		//Assign username
-		this.username = username;
+	public LoginState(int user){
 		//Assign password
 		this.userid = userid;
 		//Create refresh token with 24 hour expiration

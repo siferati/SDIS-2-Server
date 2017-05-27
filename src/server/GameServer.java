@@ -1,7 +1,6 @@
 package server;
 
-import handler.MapHandler;
-import handler.UserAccHandler;
+import handler.*;
 
 import java.io.IOException;
 import java.io.FileInputStream;
@@ -95,8 +94,10 @@ public class GameServer {
             });
 
             // Context + Handler
-            httpsServer.createContext("/users", new UserAccHandler(sqlConn));
-            httpsServer.createContext("/maps", new MapHandler(sqlConn));
+            httpServer.createContext("/users", new UserAccHandler(sqlConn));
+            httpServer.createContext("/maps", new MapHandler(sqlConn));
+            httpServer.createContext("/tokens", new TokenHandler(sqlConn));
+            httpServer.createContext("/tokens", new GameHandler(sqlConn));
 
             // Create Default Executor
             httpsServer.setExecutor(null);

@@ -73,14 +73,12 @@ public class UserAccHandler extends Handler {
             //If user is valid, create a session of him
             States.loginUser(userName,userId);
 
-            //Create response body, with username, access token and refresh token
-            LoginState state = States.getUser(userName);
             //Build response
             response = new JSONObject();
 
             response.put("username",userName);
-            response.put("accesstoken",state.accessToken.toString());
-            response.put("refreshtoken",state.refreshToken.toString());
+            response.put("accesstoken",States.getUserAToken(userName));
+            response.put("refreshtoken",States.getUserRToken(userName));
             //Send response
             sendHttpResponse(t,303,response.toString());
         }catch(Exception e){

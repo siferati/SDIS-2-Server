@@ -12,34 +12,41 @@ public class States{
 	public static Hashtable<String,GameState> games = new Hashtable<String,GameState>();
 	
 	//Game methods
-	public static void createGame(String owner,String map){
+	public static boolean createGame(String owner,String map){
 		if(games.get(owner) != null){
 			games.remove(owner);
 		}else games.put(owner, new GameState(map));
+		System.out.println("Game create by " + owner + " on map " + map);
+		return true;
 	}
 
-	public static void joinGame(String owner,String username, String position){
+	public static boolean joinGame(String owner,String username, String position){
 		if(games.get(owner) != null){
 			games.get(owner).addPlayer(username,position);
-		}
+		}else return false;
+		System.out.println("User " + username + " has joined the game hosted by " + owner);
+		return true;
 	}
 
-	public static void changePosition(String owner,String username, String position){
+	public static boolean changePosition(String owner,String username, String position){
 		if(games.get(owner) != null){
-			games.get(owner).changePosition(username,position);
-		}
+			return games.get(owner).changePosition(username,position);
+		}else return false;
 	}
 
 	public static void leaveGame(String owner, String username){
 		if(games.get(owner) != null){
 			games.get(owner).removePlayer(username);
 		}
+		System.out.println("User " + username + " has left the game hosted by " + owner);
 	}
 
-	public static void deleteGame(String owner){
+	public static boolean deleteGame(String owner){
 		if(games.get(owner) != null){
 			games.remove(owner);
-		}
+		}else return false;
+		System.out.println("Game hosted by " + owner + " has been ended");
+		return true;
 	}
 	//User log in state methods
 	public static void loginUser(String username,int userid){
@@ -47,6 +54,7 @@ public class States{
 			loggedUsers.remove(username);
 		}
 		loggedUsers.put(username,new LoginState(userid));
+		System.out.println("User " + username + " has logged in");
 	}
 
 	public static LoginState getUser(String username){

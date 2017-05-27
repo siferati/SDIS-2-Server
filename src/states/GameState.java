@@ -21,10 +21,11 @@ public class GameState{
         players.put(username,new Player(position));
     }
 
-    public void changePosition(String username, String position){
+    public boolean changePosition(String username, String position){
         if(players.get(username) != null){
             players.get(username).setCoords(position);
-        }
+            return true;
+        }else return false;
     }
 
     public void removePlayer(String username){

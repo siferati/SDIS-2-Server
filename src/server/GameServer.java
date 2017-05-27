@@ -97,7 +97,8 @@ public class GameServer {
             httpsServer.createContext("/users", new UserAccHandler(sqlConn));
             httpsServer.createContext("/maps", new MapHandler(sqlConn));
             httpsServer.createContext("/tokens", new TokenHandler(sqlConn));
-            httpsServer.createContext("/tokens", new GameHandler(sqlConn));
+            httpsServer.createContext("/game", new GameHandler(sqlConn));
+            httpsServer.createContext("/players", new PlayerHandler(sqlConn));
 
             // Create Default Executor
             httpsServer.setExecutor(null);

@@ -128,6 +128,39 @@ public class PlayerHandler extends Handler {
     private void deletePlayer(HttpExchange t){
         System.out.println("DELETE " + t.getRequestURI());
         
+        try{
+            String value = this.getBodyToString(t);
+            JSONObject o = new JSONObject(value);
+
+            String userName = o.getString("username");
+            String accessToken = o.getString("accesstoken");
+            String owner = o.getString("owner");
+
+            //Check if user logged and access token correct
+            if(!States.userLogged(userName)){
+                System.err.println("User not logged in");
+                this.sendHttpResponse(t,403,"");
+                return;
+            }
+            if(!States.validToken(userName)){
+                System.err.println("Token expired");
+                this.sendHttpResponse(t,401,"");
+                return;
+            }
+
+            if(States.deleteGame(userName)){
+                this.sendHttpResponse(t,200,"");
+            }else this.sendHttpResponse(t,404,"");
+
+        }catch(Exception e){
+            System.out.println("Error accessing getting game list.");
+            try{
+                this.sendHttpResponse(t,400,"");
+            }catch(Exception e2){
+
+            }
+            return;
+        }
 
     }
 }

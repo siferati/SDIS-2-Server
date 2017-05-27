@@ -35,11 +35,14 @@ public class States{
 		}else return false;
 	}
 
-	public static void leaveGame(String owner, String username){
+	public static boolean leaveGame(String owner, String username){
+		boolean success = false;
 		if(games.get(owner) != null){
-			games.get(owner).removePlayer(username);
+			success = games.get(owner).removePlayer(username);
 		}
-		System.out.println("User " + username + " has left the game hosted by " + owner);
+		if(success)
+			System.out.println("User " + username + " has left the game hosted by " + owner);
+		return success;
 	}
 
 	public static boolean deleteGame(String owner){

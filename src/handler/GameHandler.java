@@ -125,7 +125,7 @@ public class GameHandler extends Handler {
 
             //Check if user logged and access token correct
             if(!States.userLogged(userName)){
-                System.err.println("User not logged in");
+                System.err.println("User not logged in: ");
                 this.sendHttpResponse(t,403,"");
                 return;
             }
@@ -136,7 +136,7 @@ public class GameHandler extends Handler {
             }
 
             if(States.createGame(userName,mapName)){
-                this.sendHttpResponse(t,200,"");
+                this.sendHttpResponse(t,200,"{}");
             }else this.sendHttpResponse(t,404,"");
 
         }catch(Exception e){

@@ -19,7 +19,8 @@ public class Token{
     }
 
     public boolean isExpired(){
-        return (start + duration) > System.currentTimeMillis();
+		System.out.println("Token: " + (start + duration) + " ; " + System.currentTimeMillis());
+        return (start + duration) < System.currentTimeMillis();
     }
     public void generateToken(){
 		char[] chars = "abcdefghijklmnopqrstuvwxyz1234567890".toCharArray();

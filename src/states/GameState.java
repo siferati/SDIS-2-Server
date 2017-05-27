@@ -10,20 +10,20 @@ import db.*;
 public class GameState{
     //All players in the game(key = username)
     public Hashtable<String,Player> players;
-    public GameMap map;
+    public String map;
 
-    public GameState(GameMap map){
+    public GameState(String map){
         players = new Hashtable<String,Player>();
         this.map = map;
     }
 
-    public void addPlayer(String username,double lat, double lng){
-        players.put(username,new Player(lat,lng));
+    public void addPlayer(String username,String position){
+        players.put(username,new Player(position));
     }
 
-    public void changePosition(String username, double lat, double lng){
+    public void changePosition(String username, String position){
         if(players.get(username) != null){
-            players.get(username).setCoords(lat,lng);
+            players.get(username).setCoords(position);
         }
     }
 

@@ -15,6 +15,7 @@ public class States{
 	public static boolean createGame(String owner,String map){
 		if(games.get(owner) != null){
 			games.remove(owner);
+			games.put(owner, new GameState(map));
 		}else games.put(owner, new GameState(map));
 		System.out.println("Game create by " + owner + " on map " + map);
 		return true;

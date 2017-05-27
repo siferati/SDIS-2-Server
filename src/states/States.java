@@ -12,21 +12,21 @@ public class States{
 	public static Hashtable<String,GameState> games = new Hashtable<String,GameState>();
 	
 	//Game methods
-	public static void createGame(String owner,GameMap map){
+	public static void createGame(String owner,String map){
 		if(games.get(owner) != null){
 			games.remove(owner);
 		}else games.put(owner, new GameState(map));
 	}
 
-	public static void joinGame(String owner,String username, double lat, double lng){
+	public static void joinGame(String owner,String username, String position){
 		if(games.get(owner) != null){
-			games.get(owner).addPlayer(username,lat,lng);
+			games.get(owner).addPlayer(username,position);
 		}
 	}
 
-	public static void changePosition(String owner,String username, double lat, double lng){
+	public static void changePosition(String owner,String username, String position){
 		if(games.get(owner) != null){
-			games.get(owner).changePosition(username,lat,lng);
+			games.get(owner).changePosition(username,position);
 		}
 	}
 

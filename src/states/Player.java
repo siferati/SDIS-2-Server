@@ -8,16 +8,13 @@ import java.io.*;
 import db.*;
 
 public class Player{
-    public double lat;
-    public double lng;
+    public String position;
     //Create player
-    public Player(double lat, double lng){
-        this.lat = lat;
-        this.lng = lng;
+    public Player(String position){
+        this.position = position;
     }
     //Update player coordinates
-    public void setCoords(double lat, double lng){
-        lat = lat;
-        lng = lng;
+    public void setCoords(String position){
+        this.position = position;
     }
 }

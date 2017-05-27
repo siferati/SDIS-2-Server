@@ -43,6 +43,7 @@ public class GameServer {
             httpServer.createContext("/users", new UserAccHandler(sqlConn));
             httpServer.createContext("/maps", new MapHandler(sqlConn));
             httpServer.createContext("/tokens", new TokenHandler(sqlConn));
+            httpServer.createContext("/tokens", new GameHandler(sqlConn));
 
             // Create Default Executor
             httpServer.setExecutor(null);

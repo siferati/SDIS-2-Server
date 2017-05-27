@@ -8,8 +8,40 @@ import java.io.*;
 import db.*;
 
 public class States{
-	public static Hashtable<String,LoginState> loggedUsers;
+	public static Hashtable<String,LoginState> loggedUsers = new Hashtable<String,LoginState>();
+	public static Hashtable<String,GameState> games = new Hashtable<String,GameState>();
+	
+	//Game methods
+	public static void createGame(String owner,GameMap map){
+		if(games.get(owner) != null){
+			games.remove(owner);
+		}else games.put(owner, new GameState(map));
+	}
 
+	public static void joinGame(String owner,String username, double lat, double lng){
+		if(games.get(owner) != null){
+			games.get(owner).addPlayer(username,lat,lng);
+		}
+	}
+
+	public static void changePosition(String owner,String username, double lat, double lng){
+		if(games.get(owner) != null){
+			games.get(owner).changePosition(username,lat,lng);
+		}
+	}
+
+	public static void leaveGame(String owner, String username){
+		if(games.get(owner) != null){
+			games.get(owner).removePlayer(username);
+		}
+	}
+
+	public static void deleteGame(String owner){
+		if(games.get(owner) != null){
+			games.remove(owner);
+		}
+	}
+	//User log in state methods
 	public static void loginUser(String username,int userid){
 		if(loggedUsers.get(username) != null){
 			loggedUsers.remove(username);

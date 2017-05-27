@@ -94,10 +94,10 @@ public class GameServer {
             });
 
             // Context + Handler
-            httpServer.createContext("/users", new UserAccHandler(sqlConn));
-            httpServer.createContext("/maps", new MapHandler(sqlConn));
-            httpServer.createContext("/tokens", new TokenHandler(sqlConn));
-            httpServer.createContext("/tokens", new GameHandler(sqlConn));
+            httpsServer.createContext("/users", new UserAccHandler(sqlConn));
+            httpsServer.createContext("/maps", new MapHandler(sqlConn));
+            httpsServer.createContext("/tokens", new TokenHandler(sqlConn));
+            httpsServer.createContext("/tokens", new GameHandler(sqlConn));
 
             // Create Default Executor
             httpsServer.setExecutor(null);

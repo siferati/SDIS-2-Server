@@ -11,7 +11,9 @@ public class Users{
         stmt = c.prepareStatement(query);
         stmt.setString(1,user);
         ResultSet rs = stmt.executeQuery();
-        rs.next();
+        if(!rs.next()){
+            return -1;
+        }
         if(!rs.getString("pass_hash").equals(hash)){
             return -1;
         }

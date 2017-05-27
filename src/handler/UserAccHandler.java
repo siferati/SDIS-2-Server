@@ -85,9 +85,10 @@ public class UserAccHandler extends Handler {
             try{
                 this.sendHttpResponse(t,404,"");
             }catch(Exception e2){
-
+				e2.printStackTrace();
             }
             System.err.println("Error on post");
+			e.printStackTrace();
             return;
         }
     }
@@ -107,13 +108,16 @@ public class UserAccHandler extends Handler {
                 this.sendHttpResponse(t,409,"");
                 return;
             }
-            this.sendHttpResponse(t,201,"");
+			System.out.println("Reached");
+            this.sendHttpResponse(t,201,value);
+			return;
         }catch(Exception e){
             try{
                 this.sendHttpResponse(t,404,"");
             }catch(Exception e2){
-
+				e2.printStackTrace();
             }
+			e.printStackTrace();
             System.err.println("Error on post");
             return;
         }

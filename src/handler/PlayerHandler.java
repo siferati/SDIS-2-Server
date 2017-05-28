@@ -91,7 +91,7 @@ public class PlayerHandler extends Handler {
             String userName = o.getString("username");
             String accessToken = o.getString("accesstoken");
             String ownerName = o.getString("owner");
-            JSONObject position = o.getJSONObject("postion");
+            JSONObject position = o.getJSONObject("position");
 
             //Check if user logged and access token correct
             if(!States.userLogged(userName)){

@@ -143,7 +143,7 @@ public class MapHandler extends Handler {
                 this.sendHttpResponse(t,401,"");
                 return;
             }
-            int userId = States.getUserId(userName);
+            int userId = Users.getUserId(SQLConnection,userName);
             //Check if map exists
             if(Maps.getMap(SQLConnection,mapname).next()){
                 Maps.deleteMap(SQLConnection,mapname,userId);
@@ -154,6 +154,7 @@ public class MapHandler extends Handler {
             int mapId = Maps.insertMap(SQLConnection,mapname,userId,startlat,startlng,finishlat,finishlng);
             //Check if insert wasn't successful'
             if(mapId == -1){
+				System.err.println("Insert wasn't successful");
                 return;
             }
             //Create lines

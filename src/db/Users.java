@@ -35,7 +35,7 @@ public class Users{
         PreparedStatement stmt1;
         stmt1 = c.prepareStatement(query1);
         stmt1.setString(1,user);
-        ResultSet rs = stmt1.execute();
+        ResultSet rs = stmt1.executeQuery();
         if(rs.next()){
             return false;
         }

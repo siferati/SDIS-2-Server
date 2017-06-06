@@ -29,7 +29,16 @@ public class Users{
         rs.next();
         return rs.getInt("id");
     }
+
     public static boolean insertUser(Connection c,String user,String hash) throws Exception{
+        String query1 = "SELECT username FROM UserAcc WHERE username = ?";
+        PreparedStatement stmt1;
+        stmt1 = c.prepareStatement(query1);
+        stmt1.setString(1,user);
+        ResultSet rs = stmt1.execute();
+        if(rs.next()){
+            return false;
+        }
         String query = "INSERT INTO UserAcc(username,pass_hash) VALUES (?,?)";
         PreparedStatement stmt;
         stmt = c.prepareStatement(query);

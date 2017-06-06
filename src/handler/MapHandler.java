@@ -83,7 +83,7 @@ public class MapHandler extends Handler {
             
             obj.put("finishlat",rs.getFloat("finishlat"));
             obj.put("finishlng",rs.getFloat("finishlng"));
-            obj.put("startlat",rs.getFloat("startlng"));
+            obj.put("startlat",rs.getFloat("startlat"));
             obj.put("startlng",rs.getFloat("startlng"));
             obj.put("owner",rs3.getString("username"));
             obj.put("name",rs.getString("name"));
